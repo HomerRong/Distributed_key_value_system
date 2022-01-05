@@ -1,0 +1,42 @@
+syntax = "proto3";
+package raftrpc;
+
+option go_package="./;raftrpc";
+
+service Raftrpc{
+  rpc HandleMessage(Message) returns(Response){}
+}
+
+enum MessageType{
+    MsgEmpty = 0;
+    MagNewElection = 1;
+    MsgHeartBeat = 2;
+    MsgAppend = 3;
+
+}
+
+message Response {
+  MessageType msg_type = 1;
+  int64 term = 2;
+  bool match = 3;
+  int64 match_index = 4;
+  string address = 5;
+  bool  append_success = 6;
+}
+
+
+
+message Entry {
+  int64 term = 1;
+  int64 index = 2;
+  bytes data = 3;
+}
+
+message Message{
+    MessageType msg_type = 1;
+    int64 term = 2;
+    int64 index = 3;
+    repeated Entry entries = 4;
+    string leader_address = 5;
+    bool match_check = 6;
+}

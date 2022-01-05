@@ -1,0 +1,41 @@
+syntax = "proto3";
+package kvrpc;
+
+option go_package="./;kvrpc";
+
+
+service KVrpc{
+    rpc RawPut(RawPutRequest) returns (RawPutResponse){}
+    rpc RawGet(RawGetRequest) returns (RawGetResponse){}
+    rpc RawDel(RawDelRequest) returns (RawDelResponse){}
+}
+
+
+message RawPutRequest{
+    bytes key = 1;
+    bytes value = 2;
+}
+
+message RawPutResponse{
+    string error = 1;
+}
+
+
+message RawGetRequest{
+    bytes key = 1;
+}
+
+message RawGetResponse{
+    bytes value = 1;
+    string error = 2;
+    bool not_found = 3;
+}
+
+
+message RawDelRequest{
+    bytes key = 1;
+}
+
+message RawDelResponse{
+    string error = 1;
+}
