@@ -179,7 +179,7 @@ func (s *server) HandleMessage(ctx context.Context, message *raftpb.Message) (*r
 	}
 
 	// 收到选举信息
-	if message.GetMsgType() == raftpb.MessageType_MagNewElection {
+	if message.GetMsgType() == raftpb.MessageType_MsgNewElection {
 		//log.Println(message.GetTerm(), s.r.Log.entries[s.r.Log.LastIndex()].GetTerm())
 
 		/*
@@ -187,10 +187,10 @@ func (s *server) HandleMessage(ctx context.Context, message *raftpb.Message) (*r
 			投票，否则拒绝投票
 		*/
 		if len(s.r.Log.entries) == 0 || s.r.Log.entries[s.r.Log.LastIndex()].GetTerm() < message.GetTerm() {
-			return &raftpb.Response{MsgType: raftpb.MessageType_MagNewElection, Address: s.r.NodeAddress}, nil
+			return &raftpb.Response{MsgType: raftpb.MessageType_MsgNewElection, Address: s.r.NodeAddress}, nil
 		} else if s.r.Log.entries[s.r.Log.LastIndex()].GetTerm() == message.GetTerm() {
 			if s.r.Log.LastIndex() <= message.GetIndex() {
-				return &raftpb.Response{MsgType: raftpb.MessageType_MagNewElection, Address: s.r.NodeAddress}, nil
+				return &raftpb.Response{MsgType: raftpb.MessageType_MsgNewElection, Address: s.r.NodeAddress}, nil
 			}
 		}
 
@@ -258,7 +258,7 @@ func (s *server) HandleMessage(ctx context.Context, message *raftpb.Message) (*r
 // 处理发送rpc后的返回结果
 func handleResponse(r *Raft, response *raftpb.Response) {
 	// 收到投票信息，检查选票是否过半，如过半，成为leader
-	if response.GetMsgType() == raftpb.MessageType_MagNewElection && r.State == Candidate {
+	if response.GetMsgType() == raftpb.MessageType_MsgNewElection && r.State == Candidate {
 		r.voteRecord[response.GetAddress()] = true
 		log.Printf("%v get vote from %v\n", r.NodeAddress, response.GetAddress())
 		count := 0
@@ -386,12 +386,12 @@ func (r *Raft) BecomeCandidate() {
 	for i := 0; i < len(r.PeerNodeAddress); i++ {
 		if len(r.Log.entries) != 0 {
 			sendMessage(r, r.PeerNodeAddress[i],
-				&raftpb.Message{MsgType: raftpb.MessageType_MagNewElection,
+				&raftpb.Message{MsgType: raftpb.MessageType_MsgNewElection,
 					Term:  r.Log.entries[r.Log.LastIndex()].GetTerm(),
 					Index: r.Log.LastIndex()})
 		} else {
 			sendMessage(r, r.PeerNodeAddress[i],
-				&raftpb.Message{MsgType: raftpb.MessageType_MagNewElection,
+				&raftpb.Message{MsgType: raftpb.MessageType_MsgNewElection,
 					Term:  r.Terms - 1,
 					Index: r.Log.LastIndex()})
 		}

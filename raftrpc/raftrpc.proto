@@ -9,7 +9,7 @@ service Raftrpc{
 
 enum MessageType{
     MsgEmpty = 0;
-    MagNewElection = 1;
+    MsgNewElection = 1;
     MsgHeartBeat = 2;
     MsgAppend = 3;
 
