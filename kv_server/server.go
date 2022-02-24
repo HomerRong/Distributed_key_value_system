@@ -13,10 +13,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-const (
-	port = ":50051"
-)
-
 type KVserver struct {
 	pb.KVrpcServer
 	r  *raft.Raft
